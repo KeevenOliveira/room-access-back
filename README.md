@@ -1,112 +1,110 @@
-# Room Access Back
+# Room Access — Backend
 
-Backend do sistema de controle de acesso a salas, construído com **NestJS**, **Prisma**, **TypeScript**, **Biome** e **Jest**, seguindo os princípios de **DDD** e **Clean Architecture**.
+[![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat&logo=nestjs&logoColor=white)](https://nestjs.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat&logo=prisma&logoColor=white)](https://www.prisma.io)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org)
+
+Backend service for managing room access control — handling rooms, users and access logs with granted/denied status tracking.
+
+> Frontend repository: [room-access-front](https://github.com/KeevenOliveira/room-access-front)
+
+![Room Access Preview](./assets/image.png)
 
 ---
 
 ## Stack
 
-| Ferramenta | Finalidade |
+| Tool | Purpose |
 |---|---|
-| NestJS | Framework HTTP (Fastify adapter) |
+| NestJS | HTTP framework (Fastify adapter) |
 | Prisma | ORM / migrations |
 | TypeScript | Type safety |
 | Biome | Linter + Formatter |
-| Jest + SWC | Testes unitários (rápido) |
-| Swagger | Documentação da API |
-| Zod / class-validator | Validação de entrada |
+| Jest + SWC | Unit testing |
+| Swagger | API documentation |
+| class-validator | Request validation |
+| Docker | Local PostgreSQL setup |
 
 ---
 
-## Arquitetura
+## Architecture
 
 ```
 src/
-├── core/                         # Shared Kernel (agnóstico de domínio)
+├── core/                         # Shared Kernel (domain-agnostic)
 │   ├── domain/
-│   │   ├── entities/             # Entity & AggregateRoot base
+│   │   ├── entities/             # Entity & AggregateRoot base classes
 │   │   ├── value-objects/        # ValueObject & UniqueEntityId
 │   │   ├── events/               # DomainEvent base
 │   │   └── errors/               # DomainError, Either (Result pattern)
 │   ├── application/
-│   │   ├── use-case.interface.ts # Contrato genérico de UseCase
-│   │   └── pagination.ts         # Paginação reutilizável
+│   │   ├── use-case.interface.ts # Generic UseCase contract
+│   │   └── pagination.ts         # Reusable pagination helpers
 │   └── infrastructure/
 │       ├── database/             # PrismaService + DatabaseModule (Global)
 │       └── http/filters/         # DomainExceptionFilter
 │
 └── modules/
-    └── rooms/                    # Módulo de salas (exemplo)
-        ├── domain/
-        │   ├── entities/         # Room (AggregateRoot)
-        │   ├── value-objects/    # RoomName (ValueObject)
-        │   └── repositories/     # RoomRepository (interface abstrata)
-        ├── application/
-        │   └── use-cases/
-        │       ├── create-room/  # DTO + UseCase + spec
-        │       ├── find-room/    # DTO + UseCase + spec
-        │       └── list-rooms/   # UseCase
-        ├── infrastructure/
-        │   ├── controllers/      # RoomController (HTTP)
-        │   ├── repositories/     # PrismaRoomRepository + InMemoryRoomRepository
-        │   ├── mappers/          # RoomMapper (domain ↔ persistence)
-        │   └── presenters/       # RoomPresenter (domain → HTTP response)
-        └── rooms.module.ts
+    └── rooms/                    # Rooms feature module
+        ├── domain/               # Room (AggregateRoot), RoomName (VO), RoomRepository (abstract)
+        ├── application/          # CreateRoom, FindRoomById, ListRooms use-cases + DTOs
+        └── infrastructure/       # Controller, PrismaRepository, InMemoryRepository, Mapper, Presenter
 ```
 
-### Camadas e responsabilidades
+### Layer responsibilities
 
-- **Domain**: regras de negócio puras, sem dependências externas. Entidades, Value Objects, erros de domínio.
-- **Application**: orquestra casos de uso. Depende apenas de interfaces do domínio.
-- **Infrastructure**: implementações concretas (Prisma, HTTP controllers). Depende das camadas acima.
-- **Core**: primitivos compartilhados entre todos os módulos (Entity, VO, Either, etc).
+- **Domain** — pure business rules, no external dependencies. Entities, Value Objects, domain errors.
+- **Application** — orchestrates use-cases. Depends only on domain interfaces.
+- **Infrastructure** — concrete implementations (Prisma, HTTP controllers). Depends on the layers above.
+- **Core** — shared primitives across all modules (Entity, VO, Either, etc).
 
 ---
 
-## Padrões adotados
+## Patterns
 
-- **Either / Result Pattern** — casos de uso retornam `Either<Error, Output>` ou lançam `DomainError`
-- **Repository Pattern** — `RoomRepository` é uma classe abstrata injetada via DI; produção usa Prisma, testes usam `InMemoryRoomRepository`
-- **Mapper** — isola a conversão entre modelo Prisma e entidade de domínio
-- **Presenter** — formata a resposta HTTP sem expor detalhes internos da entidade
-- **AggregateRoot** — suporta domain events (adicionados com `addDomainEvent`)
+- **Either / Result Pattern** — use-cases throw typed `DomainError` subclasses
+- **Repository Pattern** — `RoomRepository` is an abstract class injected via DI; production uses Prisma, tests use `InMemoryRoomRepository`
+- **Mapper** — isolates the conversion between Prisma model and domain entity
+- **Presenter** — formats HTTP response without exposing entity internals
+- **AggregateRoot** — supports domain events via `addDomainEvent()`
 
 ---
 
 ## Setup
 
 ```bash
-# 1. Copie as variáveis de ambiente
+# 1. Copy environment variables
 cp .env.example .env
 
-# 2. Instale as dependências
+# 2. Install dependencies
 npm install
 
-# 3. Gere o Prisma Client
-npm run prisma:generate
+# 3. Start the database
+npm run docker:up
 
-# 4. Rode as migrations (precisa de banco Postgres rodando)
+# 4. Run migrations
 npm run prisma:migrate
 
-# 5. Popule dados iniciais (opcional)
+# 5. (Optional) Seed initial data
 npm run prisma:seed
 
-# 6. Inicie em modo desenvolvimento
+# 6. Start in development mode
 npm run start:dev
 ```
 
-A API estará disponível em `http://localhost:3000/api/v1`.
-Documentação Swagger em `http://localhost:3000/api/docs`.
+API available at `http://localhost:3001/api/v1`  
+Swagger docs at `http://localhost:3001/api/docs`
 
 ---
 
-## Testes
+## Testing
 
 ```bash
-# Unitários
+# Unit tests
 npm test
 
-# Com cobertura
+# With coverage
 npm run test:cov
 
 # Watch mode
@@ -118,23 +116,35 @@ npm run test:watch
 ## Lint & Format
 
 ```bash
-# Verificar e corrigir lint + format
+# Check and fix lint + format
 npm run check
 
-# Somente format
+# Format only
 npm run format
 
-# Somente lint
+# Lint only
 npm run lint
 ```
 
 ---
 
-## Adicionando um novo módulo
+## Production
 
-1. Crie a pasta `src/modules/<nome>/`
-2. Implemente `domain/entities/`, `domain/value-objects/`, `domain/repositories/`
-3. Crie os use-cases em `application/use-cases/`
-4. Implemente o repositório Prisma em `infrastructure/repositories/`
-5. Crie o controller em `infrastructure/controllers/`
-6. Registre tudo em `<nome>.module.ts` e importe no `AppModule`
+```bash
+# Full deploy pipeline (generate, migrate, build)
+npm run deploy
+
+# Start production server
+npm run start:prod
+```
+
+---
+
+## Adding a new module
+
+1. Create `src/modules/<name>/`
+2. Implement `domain/entities/`, `domain/value-objects/`, `domain/repositories/`
+3. Create use-cases under `application/use-cases/`
+4. Implement the Prisma repository in `infrastructure/repositories/`
+5. Create the controller in `infrastructure/controllers/`
+6. Register everything in `<name>.module.ts` and import it in `AppModule`

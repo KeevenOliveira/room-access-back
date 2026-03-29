@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CreateRoomUseCase } from './application/use-cases/create-room/create-room.use-case';
+import { DeleteRoomUseCase } from './application/use-cases/delete-room/delete-room.use-case';
 import { FindRoomByIdUseCase } from './application/use-cases/find-room/find-room.use-case';
 import { ListRoomsUseCase } from './application/use-cases/list-rooms/list-rooms.use-case';
 import { RoomRepository } from './domain/repositories/room.repository';
@@ -11,6 +12,7 @@ import { PrismaRoomRepository } from './infrastructure/repositories/prisma-room.
   providers: [
     { provide: RoomRepository, useClass: PrismaRoomRepository },
     CreateRoomUseCase,
+    DeleteRoomUseCase,
     FindRoomByIdUseCase,
     ListRoomsUseCase,
   ],

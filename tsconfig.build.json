@@ -1,4 +1,4 @@
-j{
+{
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "rootDir": "src"

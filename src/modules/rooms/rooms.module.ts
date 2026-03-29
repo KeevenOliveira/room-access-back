@@ -14,5 +14,6 @@ import { PrismaRoomRepository } from './infrastructure/repositories/prisma-room.
     FindRoomByIdUseCase,
     ListRoomsUseCase,
   ],
+  exports: [RoomRepository],
 })
 export class RoomsModule {}

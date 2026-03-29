@@ -18,8 +18,23 @@ model Room {
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt @map("updated_at")
   accesses    RoomAccess[]
+  accessCodes AccessCode[]
 
   @@map("rooms")
+}
+
+model AccessCode {
+  id        String   @id @default(uuid())
+  roomId    String   @map("room_id")
+  code      String   @unique
+  nickname  String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@map("access_codes")
 }
 
 model User {

@@ -28,6 +28,13 @@ export class PrismaAccessCodeRepository extends AccessCodeRepository {
     return rows.map(AccessCodeMapper.toDomain);
   }
 
+  async findByNicknameAndRoomId(nickname: string, roomId: string): Promise<AccessCode | null> {
+    const row = await this.prisma.accessCode.findFirst({
+      where: { nickname, roomId, isActive: true },
+    });
+    return row ? AccessCodeMapper.toDomain(row) : null;
+  }
+
   async countActiveByRoomId(roomId: string): Promise<number> {
     return this.prisma.accessCode.count({ where: { roomId, isActive: true } });
   }

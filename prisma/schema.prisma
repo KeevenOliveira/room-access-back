@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  description String?
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  accesses    RoomAccess[]
+
+  @@map("rooms")
+}
+
+model User {
+  id        String       @id @default(uuid())
+  name      String
+  email     String       @unique
+  cardId    String       @unique @map("card_id")
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  accesses  RoomAccess[]
+
+  @@map("users")
+}
+
+model RoomAccess {
+  id         String           @id @default(uuid())
+  roomId     String           @map("room_id")
+  userId     String           @map("user_id")
+  accessedAt DateTime         @default(now()) @map("accessed_at")
+  status     RoomAccessStatus @default(GRANTED)
+
+  room Room @relation(fields: [roomId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([roomId])
+  @@index([userId])
+  @@map("room_accesses")
+}
+
+enum RoomAccessStatus {
+  GRANTED
+  DENIED
+}

@@ -5,14 +5,14 @@ import { AccessCodeValue } from '../value-objects/access-code-value.vo';
 export interface AccessCodeProps {
   roomId: string;
   code: AccessCodeValue;
-  nickname: string;
+  nickname: string | null;
   isActive: boolean;
   createdAt: Date;
 }
 
 export interface CreateAccessCodeProps {
   roomId: string;
-  nickname: string;
+  nickname?: string | null;
 }
 
 export class AccessCode extends AggregateRoot<AccessCodeProps> {
@@ -26,7 +26,7 @@ export class AccessCode extends AggregateRoot<AccessCodeProps> {
       {
         roomId: props.roomId,
         code: AccessCodeValue.create(rawCode),
-        nickname: props.nickname,
+        nickname: props.nickname ?? null,
         isActive: true,
         createdAt: new Date(),
       },
@@ -53,7 +53,7 @@ export class AccessCode extends AggregateRoot<AccessCodeProps> {
     return this.props.code;
   }
 
-  get nickname(): string {
+  get nickname(): string | null {
     return this.props.nickname;
   }
 

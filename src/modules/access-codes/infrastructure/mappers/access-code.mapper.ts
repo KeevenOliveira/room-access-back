@@ -9,7 +9,7 @@ export class AccessCodeMapper {
       {
         roomId: raw.roomId,
         code: AccessCodeValue.create(raw.code),
-        nickname: raw.nickname ?? '',
+        nickname: raw.nickname,
         isActive: raw.isActive,
         createdAt: raw.createdAt,
       },
@@ -21,7 +21,7 @@ export class AccessCodeMapper {
     id: string;
     roomId: string;
     code: string;
-    nickname: string;
+    nickname: string | null;
     isActive: boolean;
     createdAt: Date;
   } {

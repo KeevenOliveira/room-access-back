@@ -32,19 +32,21 @@ export class CreateAccessCodeUseCase
       throw new ConflictError('Room has reached the maximum of 4 active access codes.');
     }
 
-    const duplicateNickname = await this.accessCodeRepository.findByNicknameAndRoomId(
-      input.nickname,
-      input.roomId,
-    );
-    if (duplicateNickname) {
-      throw new ConflictError(
-        `An active code with nickname '${input.nickname}' already exists in this room.`,
+    if (input.nickname) {
+      const duplicateNickname = await this.accessCodeRepository.findByNicknameAndRoomId(
+        input.nickname,
+        input.roomId,
       );
+      if (duplicateNickname) {
+        throw new ConflictError(
+          `An active code with nickname '${input.nickname}' already exists in this room.`,
+        );
+      }
     }
 
     const accessCode = AccessCode.create({
       roomId: input.roomId,
-      nickname: input.nickname,
+      nickname: input.nickname ?? null,
     });
 
     await this.accessCodeRepository.save(accessCode);

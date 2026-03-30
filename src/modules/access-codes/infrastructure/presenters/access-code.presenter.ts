@@ -4,7 +4,7 @@ export interface AccessCodePresenterOutput {
   id: string;
   roomId: string;
   code: string;
-  nickname: string;
+  nickname: string | null;
   isActive: boolean;
   createdAt: Date;
 }

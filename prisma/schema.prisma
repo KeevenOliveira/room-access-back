@@ -27,7 +27,7 @@ model AccessCode {
   id        String   @id @default(uuid())
   roomId    String   @map("room_id")
   code      String   @unique
-  nickname  String
+  nickname  String?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now()) @map("created_at")
 

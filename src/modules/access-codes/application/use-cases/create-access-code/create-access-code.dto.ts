@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAccessCodeDto {
   @ApiProperty({ example: 'uuid-of-room' })
@@ -7,9 +7,9 @@ export class CreateAccessCodeDto {
   @IsString()
   roomId!: string;
 
-  @ApiPropertyOptional({ example: 'Office laptop' })
-  @IsOptional()
+  @ApiProperty({ example: 'Office laptop' })
+  @IsNotEmpty()
   @IsString()
   @MaxLength(100)
-  nickname?: string;
+  nickname!: string;
 }

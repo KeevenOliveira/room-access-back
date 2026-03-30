@@ -5,7 +5,7 @@ import { RoomRepository } from '../../../../rooms/domain/repositories/room.repos
 import type { ValidateAccessDto } from './validate-access.dto';
 
 export type ValidateAccessOutput =
-  | { granted: true; roomId: string; roomName: string; nickname: string | null }
+  | { granted: true; roomId: string; roomName: string; nickname: string }
   | { granted: false; reason: 'room_not_found' | 'invalid_code' };
 
 @Injectable()
